@@ -1,16 +1,25 @@
 import pandas as pd
 import psycopg2
 from psycopg2 import sql
+from datetime import datetime
 
 # ----------------------------
 # 1. Load CSV and clean headers
 # ----------------------------
 
 # Load .csv file into DataFrame
-#df = pd.read_csv("Dataset.csv", encoding='utf-8-sig')
+df = pd.read_csv("Dataset.csv", encoding='utf-8-sig')
 
 # Load .json file into DataFrame
-df = pd.read_json("Dataset.json")
+#df = pd.read_json("Dataset.json")
+
+#Auto Detect CSV or JSON File   
+
+#----------------------------
+# Create log file
+#----------------------------
+log_filename= f"insert_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+log_file = open(log_filename, "w", encoding="utf-8")
 
 #----------------------------
 # 2. Data Cleaning/Transformation
@@ -38,6 +47,32 @@ conn = psycopg2.connect(
 )
 cursor = conn.cursor()
 
+#FOR TESTING PURPOSES
+#dropping table in DB to add it again
+cursor.execute("DROP TABLE IF EXISTS orderhistory;")
+cursor.execute("""CREATE TABLE IF NOT EXISTS OrderHistory (
+    OrderID INT PRIMARY KEY,
+    OrderDate DATE,
+    UnitCost DECIMAL(18,8),
+    Price DECIMAL(12,2),
+    OrderQty INT,
+    CostOfSales DECIMAL(18,8),
+    Sales DECIMAL(14,2),
+    Profit DECIMAL(18,8),
+    Channel VARCHAR(150),
+    PromotionName VARCHAR(150),
+    ProductName VARCHAR(150),
+    Manufacturer VARCHAR(150),
+    ProductSubCategory VARCHAR(150),
+    ProductCategory VARCHAR(150),
+    Region VARCHAR(150),
+    City VARCHAR(150),
+    Country VARCHAR(150)
+);""")
+
+
+
+
 # ----------------------------
 # 4. INSERT statement (table columns are lowercase)
 # ----------------------------
@@ -61,8 +96,13 @@ ON CONFLICT (orderid) DO NOTHING;
 skippedConflicts = 0
 skippedErrors = 0
 
-for _, row in df.iterrows():
+for index, row in df.iterrows():
     try:
+        missing_fields = [key for key, value  in row.items()
+                          if value in (None, '', float('nan'))]
+        if missing_fields:
+            log_file.write(f"Skipped row at index {index} (OrderID={row.get('OrderID', 'N/A')}) due to missing fields: {', '.join(missing_fields)}\n")
+            continue
         cursor.execute(insert_query, (
             int(row['OrderID']),
             row['OrderDate'],
@@ -83,14 +123,15 @@ for _, row in df.iterrows():
             row['Country']
         ))
 
-        # Detect if there was a duplicate row confict skip
+        # Detect if there was a duplicate row confict skip & log it
         if cursor.rowcount == 0:
             skippedConflicts += 1
             print(f"[SKIPPED - CONFLICT] OrderID {row['OrderID']} already exists.")
+            log_file.write(f"[DUPLICATE] OrderID {row["OrderID"]} skipped due to conflicit.\n")
     except Exception as e:
         skippedErrors += 1
         print(f"[SKIPPED - ERROR] OrderID {row['OrderID']} caused error. Reason: {e}")
-    
+        log_file.write(f"[EROOR] row {index} could not be inserted. Reason: {e}\n")
 
 # ----------------------------
 # 5. Commit & close connection
