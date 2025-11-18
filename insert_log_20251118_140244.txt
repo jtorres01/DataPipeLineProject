@@ -1,0 +1,1 @@
+Skipped row at index 1498 (OrderID=1688) due to missing fields: City

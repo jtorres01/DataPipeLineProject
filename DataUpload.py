@@ -64,7 +64,7 @@ cursor.execute("DROP TABLE IF EXISTS orderhistory;")
 cursor.execute("""CREATE TABLE IF NOT EXISTS OrderHistory (
     OrderID INT PRIMARY KEY NOT NULL,
     OrderDate DATE NOT NULL,
-    UnitCost DECIMAL(18,8) DEFAULT 0.0,
+    UnitCost DECIMAL(18,8) NOT NULL,
     Price DECIMAL(12,2) NOT NULL,
     OrderQty INT NOT NULL,
     CostOfSales DECIMAL(18,8) NOT NULL,
@@ -104,6 +104,10 @@ ON CONFLICT (orderid) DO NOTHING;"""
 # 5. Insert each row with error detection
 # ----------------------------
 
+# List of required columns
+required_cols = ["OrderID", "OrderDate", "UnitCost", "Price", "OrderQty",
+                 "CostOfSales", "Sales", "Profit", "ProductName", "Manufacturer", "Country"]
+
 #Error encounters counters
 skippedConflicts = 0
 skippedErrors = 0
@@ -111,8 +115,9 @@ skippedErrors = 0
 
 for index, row in df.iterrows():
     try:
-        missing_fields = [key for key, value  in row.items()
-                          if value in (None, '') or pd.isna(value)]
+        missing_fields = [col for col in required_cols 
+                          if pd.isna(row[col]) or row[col] == '']
+
         if missing_fields:
             log_file.write(f"Skipped row at index {index} (OrderID={row.get('OrderID', 'N/A')}) due to missing fields: {', '.join(missing_fields)}\n")
             print(f"Skipped row at index {index} (OrderID={row.get('OrderID', 'N/A')}) due to missing fields: {', '.join(missing_fields)}\n")

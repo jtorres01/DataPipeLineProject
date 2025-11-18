@@ -1,3 +1,0 @@
-Skipped row at index 1494 (OrderID=506.0) due to missing fields: UnitCost
-Skipped row at index 1496 (OrderID=nan) due to missing fields: OrderID
-Skipped row at index 1497 (OrderID=798.0) due to missing fields: CostOfSales
