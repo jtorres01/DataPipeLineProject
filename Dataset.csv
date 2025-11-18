@@ -1493,13 +1493,11 @@ OrderID,OrderDate,UnitCost,Price,OrderQty,CostOfSales,Sales,Profit,Channel,Promo
 974,3/3/2014,0.0697262453930303,16.5,9,0.627536208537273,135.3,134.672463791463,Store,Asian Spring Promotion,Contoso Laptop Starter Bundle M200 White,"Contoso, Ltd",Computers Accessories,Computers,Asia,Taipei,Taiwan
 1375,12/2/2012,6.61306482520596,11.5,6,39.6783889512357,62.1,22.4216110487643,Online,North America Holiday Promotion,Contoso Desktop Alternative Bundle E200 White,"Contoso, Ltd",Computers Accessories,Computers,North America,Bethesda,United States
 1060,1/7/2012,6.61358103525514,9.5,8,52.9086482820411,74.1,21.1913517179589,Online,North America Spring Promotion,Contoso Power Inverter - DC to AC power inverter E900 White,"Contoso, Ltd",Computers Accessories,Computers,North America,Bethesda,United States
-506,3/18/2012,3.34608518702582,3.35,100,334.608518702582,335,0.391481297418181,Catalog,No Discount,Contoso In-Line Coupler E180 Black,"Contoso, Ltd",Cell phones Accessories,Cell phones,North America,North Harford,United States
+506,3/18/2012,6.81913213197131,3.35,100,334.608518702582,335,0.391481297418181,Catalog,No Discount,Contoso In-Line Coupler E180 Black,"Contoso, Ltd",Cell phones Accessories,Cell phones,North America,North Harford,United States
 1233,4/6/2012,3.07792711028868,3.35,100,307.792711028868,335,27.2072889711317,Online,No Discount,Contoso In-Line Coupler E180 Black,"Contoso, Ltd",Cell phones Accessories,Cell phones,North America,Bethesda,United States
 509,8/16/2012,21.4287494475342,23.9,24,514.28998674082,566.43,52.1400132591797,Reseller,North America Back-to-School Promotion,Contoso Digital camera accessory kit M200 White,"Contoso, Ltd",Computers Accessories,Computers,North America,Seattle,United States
-,5/29/2013,5.98169295329237,23.9,10,59.8169295329237,239,179.183070467076,Store,No Discount,Contoso Digital camera accessory kit M200 White,"Contoso, Ltd",Computers Accessories,Computers,North America,Falmouth,United States
+798,5/29/2013,5.98169295329237,23.9,10,59.8169295329237,239,179.183070467076,Store,No Discount,Contoso Digital camera accessory kit M200 White,"Contoso, Ltd",Computers Accessories,Computers,North America,Falmouth,United States
 1688,11/11/2012,26.3692461050988,29.9,8,210.953968840791,221.26,10.3060311592094,Store,European Holiday Promotion,Contoso USB 2.0 Dock Station docking station M800 White,"Contoso, Ltd",Computers Accessories,Computers,Europe,Koln,Germany
-511,12/20/2011,22.9495837160927,35.99,8,183.596669728742,287.92,104.323330271258,Store,European Holiday Promotion,Contoso 4 Handset Cordless Phone System M86 Grey,"Contoso, Ltd",Home & Office Phones,Cell phones,Europe,Baildon,United Kingdom
-511,12/20/2011,22.9495837160927,35.99,8,183.596669728742,287.92,104.323330271258,Store,European Holiday Promotion,Contoso 4 Handset Cordless Phone System M86 Grey,"Contoso, Ltd",Home & Office Phones,Cell phones,Europe,Baildon,United Kingdom
 
 
 

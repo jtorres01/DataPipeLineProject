@@ -2,18 +2,28 @@ import pandas as pd
 import psycopg2
 from psycopg2 import sql
 from datetime import datetime
+import os
+import glob
+
 
 # ----------------------------
 # 1. Load CSV and clean headers
 # ----------------------------
 
 # Load .csv file into DataFrame
-df = pd.read_csv("Dataset.csv", encoding='utf-8-sig')
+#df = pd.read_csv("Dataset.csv", encoding='utf-8-sig')
 
 # Load .json file into DataFrame
 #df = pd.read_json("Dataset.json")
 
-#Auto Detect CSV or JSON File   
+#Auto Detect CSV or JSON File 
+
+file_path = "Dataset.csv"  # or "Dataset.json"
+
+if file_path.endswith(".csv"):
+    df = pd.read_csv(file_path, encoding='utf-8-sig')
+else:
+    df = pd.read_json(file_path)  
 
 #----------------------------
 # Create log file
@@ -47,27 +57,28 @@ conn = psycopg2.connect(
 )
 cursor = conn.cursor()
 
+#===================================================
 #FOR TESTING PURPOSES
-#dropping table in DB to add it again
+#dropping table in DB to add it again to simulate data upload
 cursor.execute("DROP TABLE IF EXISTS orderhistory;")
 cursor.execute("""CREATE TABLE IF NOT EXISTS OrderHistory (
-    OrderID INT PRIMARY KEY,
-    OrderDate DATE,
-    UnitCost DECIMAL(18,8),
-    Price DECIMAL(12,2),
-    OrderQty INT,
-    CostOfSales DECIMAL(18,8),
-    Sales DECIMAL(14,2),
-    Profit DECIMAL(18,8),
+    OrderID INT PRIMARY KEY NOT NULL,
+    OrderDate DATE NOT NULL,
+    UnitCost DECIMAL(18,8) DEFAULT 0.0,
+    Price DECIMAL(12,2) NOT NULL,
+    OrderQty INT NOT NULL,
+    CostOfSales DECIMAL(18,8) NOT NULL,
+    Sales DECIMAL(14,2) NOT NULL,
+    Profit DECIMAL(18,8) NOT NULL,
     Channel VARCHAR(150),
     PromotionName VARCHAR(150),
-    ProductName VARCHAR(150),
-    Manufacturer VARCHAR(150),
+    ProductName VARCHAR(150) NOT NULL,
+    Manufacturer VARCHAR(150) NOT NULL,
     ProductSubCategory VARCHAR(150),
     ProductCategory VARCHAR(150),
     Region VARCHAR(150),
     City VARCHAR(150),
-    Country VARCHAR(150)
+    Country VARCHAR(150) NOT NULL
 );""")
 
 
@@ -84,24 +95,28 @@ INSERT INTO orderhistory (
     region, city, country
 )
 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-ON CONFLICT (orderid) DO NOTHING; 
-"""
+ON CONFLICT (orderid) DO NOTHING;"""
+
 # Transforming
 # ^ On conflict clause to skip duplicates based on primary key 'orderid'
 
 # ----------------------------
-# 5. Insert each row with logging
+# 5. Insert each row with error detection
 # ----------------------------
 
+#Error encounters counters
 skippedConflicts = 0
 skippedErrors = 0
+
 
 for index, row in df.iterrows():
     try:
         missing_fields = [key for key, value  in row.items()
-                          if value in (None, '', float('nan'))]
+                          if value in (None, '') or pd.isna(value)]
         if missing_fields:
             log_file.write(f"Skipped row at index {index} (OrderID={row.get('OrderID', 'N/A')}) due to missing fields: {', '.join(missing_fields)}\n")
+            print(f"Skipped row at index {index} (OrderID={row.get('OrderID', 'N/A')}) due to missing fields: {', '.join(missing_fields)}\n")
+            skippedConflicts += 1
             continue
         cursor.execute(insert_query, (
             int(row['OrderID']),
@@ -121,17 +136,18 @@ for index, row in df.iterrows():
             row['Region'],
             row['City'],
             row['Country']
-        ))
+        ))      
 
         # Detect if there was a duplicate row confict skip & log it
         if cursor.rowcount == 0:
             skippedConflicts += 1
             print(f"[SKIPPED - CONFLICT] OrderID {row['OrderID']} already exists.")
             log_file.write(f"[DUPLICATE] OrderID {row["OrderID"]} skipped due to conflicit.\n")
+        
     except Exception as e:
         skippedErrors += 1
         print(f"[SKIPPED - ERROR] OrderID {row['OrderID']} caused error. Reason: {e}")
-        log_file.write(f"[EROOR] row {index} could not be inserted. Reason: {e}\n")
+        log_file.write(f"[ERROR] row {index} could not be inserted. Reason: {e}\n")
 
 # ----------------------------
 # 5. Commit & close connection
@@ -139,6 +155,18 @@ for index, row in df.iterrows():
 conn.commit()
 cursor.close()
 conn.close()
+
+#----------------------------
+# LOG CLEANUP
+#----------------------------
+max_logs = 8
+log_files = sorted(
+    glob.glob("insert_log_*.txt"), 
+    key=os.path.getmtime,
+    reverse=True)
+
+for old_log in log_files[max_logs:]:
+    os.remove(old_log)
 
 print("----- Import Summary -----")
 print(f"Rows skipped due to conflicts: {skippedConflicts}")
