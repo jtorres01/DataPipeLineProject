@@ -60,6 +60,7 @@ cursor = conn.cursor()
 #===================================================
 #FOR TESTING PURPOSES
 #dropping table in DB to add it again to simulate data upload
+    
 cursor.execute("DROP TABLE IF EXISTS orderhistory;")
 cursor.execute("""CREATE TABLE IF NOT EXISTS OrderHistory (
     OrderID INT PRIMARY KEY NOT NULL,
