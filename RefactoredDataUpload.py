@@ -50,7 +50,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df.columns = df.columns.str.strip()
 
     # Standardize date formats
-    df['OrderDate'] = pd.to_datetime(df['OrderDate'], format='%m/%d/%Y').dt.date
+    df['OrderDate'] = pd.to_datetime(df['OrderDate'], format='%m/%d/%Y',errors='coerce').dt.date
 
     # Remove duplicates
     df = df.drop_duplicates()
@@ -145,6 +145,8 @@ def insert_row(cursor, row, log_file):
         log_file.write(f"[ERROR] OrderID {row.get('OrderID')} failed: {e}\n")
         return "error"
 
+def getUserInput(cursor,row,log_file):
+    answer = input("Would you like to input a row?")
 
 # -----------------------------------------------------------
 # 5. Log Cleanup
@@ -165,7 +167,7 @@ def cleanup_old_logs(max_logs=8):
 # -----------------------------------------------------------
 def main():
     # Choose file
-    file_path = "Dataset.csv"
+    file_path = "messy_dataset.csv"
 
     # Load
     df = load_file(file_path)
@@ -205,6 +207,8 @@ def main():
             inserted_rows += 1
         elif result == "error":
             skipped_errors += 1
+
+
 
     # Commit & close
     conn.commit()
