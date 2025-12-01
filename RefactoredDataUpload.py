@@ -3,6 +3,7 @@ import psycopg2
 from datetime import datetime
 import os
 import glob
+import matplotlib.pyplot as plt
 
 
 # -----------------------------------------------------------
@@ -167,7 +168,7 @@ def cleanup_old_logs(max_logs=8):
 # -----------------------------------------------------------
 def main():
     # Choose file
-    file_path = "messy_dataset.csv"
+    file_path = "Dataset.csv"
 
     # Load
     df = load_file(file_path)
@@ -208,7 +209,7 @@ def main():
         elif result == "error":
             skipped_errors += 1
 
-
+    
 
     # Commit & close
     conn.commit()
@@ -226,6 +227,25 @@ def main():
     print(f"Skipped errors: {skipped_errors}")
     print("ETL complete.")
 
+    # Show Graph
+    
+    userInput = input("What col do you want to sort by?")
+    userInput =userInput.title().strip()
+    plot_profit_By_UserInput(df,userInput)
+
+def plot_profit_By_UserInput(df,col):
+    
+    profitBy = df.groupby(col)["Profit"].sum().sort_values(ascending=False)
+
+    # Creating bar graph
+    plt.figure(figsize=(10,6))
+    plt.bar(profitBy.index, profitBy.values)
+    plt.xlabel(col)
+    plt.ylabel("Profit")
+    plt.title("Total Profit by Manufacturer")
+    plt.xticks(rotation =80)
+    plt.tight_layout()
+    plt.show()
 
 # -----------------------------------------------------------
 # Entry Point
