@@ -4,6 +4,16 @@ from datetime import datetime
 import os
 import glob
 import matplotlib.pyplot as plt
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+
 
 
 # -----------------------------------------------------------
@@ -74,11 +84,11 @@ def is_valid_row(row: pd.Series) -> bool:
 # -----------------------------------------------------------
 def get_db_connection():
     return psycopg2.connect(
-        dbname="RetailDB",
-        user="postgres",
-        password="1234",
-        host="localhost",
-        port="5432"
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        host=DB_HOST,
+        port=DB_PORT
     )
 
 # Recreates table for testing/demo purposes.
@@ -146,6 +156,7 @@ def insert_row(cursor, row, log_file):
         log_file.write(f"[ERROR] OrderID {row.get('OrderID')} failed: {e}\n")
         return "error"
 
+
 def getUserInput(cursor,row,log_file):
     answer = input("Would you like to input a row?")
 
@@ -168,7 +179,7 @@ def cleanup_old_logs(max_logs=8):
 # -----------------------------------------------------------
 def main():
     # Choose file
-    file_path = "Dataset.csv"
+    file_path = "Dataset50.csv"
 
     # Load
     df = load_file(file_path)
@@ -215,6 +226,11 @@ def main():
     conn.commit()
     cursor.close()
     conn.close()
+    log_file.write("----- IMPORT SUMMARY ----- \n")
+    log_file.write(f"Inserted rows: {inserted_rows}\n")
+    log_file.write(f"Skipped conflicts: {skipped_conflicts}\n")
+    log_file.write(f"Skipped errors: {skipped_errors}\n")
+    log_file.write("ETL complete.")
     log_file.close()
 
     # Log cleanup
@@ -229,7 +245,7 @@ def main():
 
     # Show Graph
     
-    userInput = input("What col do you want to sort by?")
+    userInput = input("What column do you want to sort by?")
     userInput =userInput.title().strip()
     plot_profit_By_UserInput(df,userInput)
 

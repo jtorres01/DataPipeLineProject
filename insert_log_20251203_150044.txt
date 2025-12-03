@@ -1,0 +1,5 @@
+----- IMPORT SUMMARY ----- 
+Inserted rows: 48
+Skipped conflicts: 0
+Skipped errors: 0
+ETL complete.
