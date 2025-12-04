@@ -61,10 +61,13 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df.columns = df.columns.str.strip()
 
     # Standardize date formats
-    df['OrderDate'] = pd.to_datetime(df['OrderDate'], format='%m/%d/%Y',errors='coerce').dt.date
+    df['OrderDate'] = pd.to_datetime(df['OrderDate'],
+                                      format='%m/%d/%Y',
+                                      errors='coerce'
+                                      ).dt.date
 
     # Remove duplicates
-    df = df.drop_duplicates()
+    df = df.drop_duplicates(subset=["OrderID"])
 
     return df
 
@@ -122,7 +125,7 @@ def setup_table(cursor):
 # 4. Load (Insert)
 # -----------------------------------------------------------
 def insert_row(cursor, row, log_file):
-    """Attempts to insert a row and logs the outcome."""
+    #Attempts to insert a row and logs the outcome.
 
     try:
         cursor.execute(INSERT_QUERY, (
@@ -156,9 +159,6 @@ def insert_row(cursor, row, log_file):
         log_file.write(f"[ERROR] OrderID {row.get('OrderID')} failed: {e}\n")
         return "error"
 
-
-def getUserInput(cursor,row,log_file):
-    answer = input("Would you like to input a row?")
 
 # -----------------------------------------------------------
 # 5. Log Cleanup
@@ -245,7 +245,8 @@ def main():
 
     # Show Graph
     
-    userInput = input("What column do you want to sort by?")
+    userInput = input("What column do you want to sort by?/n" \
+    "Coountry, Manufacturer")
     userInput =userInput.title().strip()
     plot_profit_By_UserInput(df,userInput)
 
