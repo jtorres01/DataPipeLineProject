@@ -241,14 +241,26 @@ def main():
     print(f"Inserted rows: {inserted_rows}")
     print(f"Skipped conflicts: {skipped_conflicts}")
     print(f"Skipped errors: {skipped_errors}")
-    print("ETL complete.")
+    print("ETL  complete.")
 
-    # Show Graph
+    # Getting user input and creating Graph
+    categories = ["Channel", "Manufacturer","Region", "City", "Country"]
     
-    userInput = input("What column do you want to sort by?/n" \
-    "Coountry, Manufacturer")
-    userInput =userInput.title().strip()
-    plot_profit_By_UserInput(df,userInput)
+    while True:   
+        userInput = input(f"Which category would you like to sort by? (Enter q to exit)")
+        userInput =userInput.title().strip()
+        if userInput == "Q" or userInput == "Q":
+            print("Exit successful.")
+            break
+        elif userInput not in categories:
+            print("Not a valid parameter. Please try again!")
+            continue
+
+        print("Outputing graph")
+        plot_profit_By_UserInput(df,userInput)
+        break # Exit the loop
+
+    #plot_profit_By_UserInput(df,userInput)      
 
 def plot_profit_By_UserInput(df,col):
     
