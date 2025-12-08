@@ -25,7 +25,7 @@ REQUIRED_COLUMNS = [
     "Manufacturer", "Country"
 ]
 
-INSERT_QUERY = """
+INSERT_QUERY = """ 
 INSERT INTO orderhistory (
     orderid, orderdate, unitcost, price, orderqty,
     costofsales, sales, profit, channel, promotionname,
@@ -179,7 +179,7 @@ def cleanup_old_logs(max_logs=8):
 # -----------------------------------------------------------
 def main():
     # Choose file
-    file_path = "Dataset50.csv"
+    file_path = "Dataset.csv"
 
     # Load
     df = load_file(file_path)
@@ -247,6 +247,7 @@ def main():
     categories = ["Channel", "Manufacturer","Region", "City", "Country"]
     
     while True:   
+        print(categories)
         userInput = input(f"Which category would you like to sort by? (Enter q to exit)")
         userInput =userInput.title().strip()
         if userInput == "Q" or userInput == "Q":
