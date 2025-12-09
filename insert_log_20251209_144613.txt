@@ -10,47 +10,19 @@
 [MISSING] Row 29 skipped due to missing values.
 [MISSING] Row 30 skipped due to missing values.
 [MISSING] Row 31 skipped due to missing values.
-[REJECTED ERROR] Failed to insert rejected row: invalid input syntax for type timestamp: "NaT"
-LINE 8: VALUES (1755, 'NaT'::timestamp, 63.7547578874289, 67.4, 4, 2...
-                      ^
-
 [MISSING] Row 32 skipped due to missing values.
-[REJECTED ERROR] Failed to insert rejected row: invalid input syntax for type timestamp: "NaT"
-LINE 8: VALUES (7119, 'NaT'::timestamp, 0.522103371749996, 343.0, 9,...
-                      ^
-
 [MISSING] Row 33 skipped due to missing values.
-[REJECTED ERROR] Failed to insert rejected row: invalid input syntax for type timestamp: "NaT"
-LINE 8: VALUES (689, 'NaT'::timestamp, 234.086252029131, 304.0, 12, ...
-                     ^
-
 [MISSING] Row 35 skipped due to missing values.
 [MISSING] Row 38 skipped due to missing values.
 [MISSING] Row 39 skipped due to missing values.
-[REJECTED ERROR] Failed to insert rejected row: invalid input syntax for type timestamp: "NaT"
-LINE 8: VALUES (7052, 'NaT'::timestamp, 23.6961707177158, 26.9, 5, 1...
-                      ^
-
 [MISSING] Row 41 skipped due to missing values.
 [MISSING] Row 42 skipped due to missing values.
 [MISSING] Row 46 skipped due to missing values.
-[REJECTED ERROR] Failed to insert rejected row: invalid input syntax for type timestamp: "NaT"
-LINE 8: VALUES (837, 'NaT'::timestamp, NULL, 95.95, 10, 510.44461487...
-                     ^
-
 [MISSING] Row 47 skipped due to missing values.
-[REJECTED ERROR] Failed to insert rejected row: invalid input syntax for type timestamp: "NaT"
-LINE 8: VALUES (407, 'NaT'::timestamp, 203.716003520618, 232.0, 16, ...
-                     ^
-
 [MISSING] Row 48 skipped due to missing values.
 [DUPLICATE] OrderID 619.0 skipped at index 49.
 [DUPLICATE] OrderID 657.0 skipped at index 50.
 [MISSING] Row 51 skipped due to missing values.
-[REJECTED ERROR] Failed to insert rejected row: invalid input syntax for type timestamp: "NaT"
-LINE 8: VALUES (416, 'NaT'::timestamp, 152.426273152695, 310.0, 16, ...
-                     ^
-
 [DUPLICATE] OrderID 58.0 skipped at index 52.
 [DUPLICATE] OrderID 58.0 skipped at index 53.
 [DUPLICATE] OrderID 58.0 skipped at index 54.

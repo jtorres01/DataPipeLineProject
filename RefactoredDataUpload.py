@@ -79,7 +79,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     # I could just have the below line run and get rid of all duplicates before attemping to insert into database,
     # but I rather have my insert_row method catch it and log all duplicates
 
-    # df = df.drop_duplicates(subset=["OrderID"])
+    #df = df.drop_duplicates(subset=["OrderID"])
 
     return df
 
@@ -117,8 +117,9 @@ def get_db_connection():
 # Recreates table for testing/demo purposes.
 
 def setup_table(cursor):
+
     cursor.execute("DROP TABLE IF EXISTS orderhistory;")
-    print("Created orderhistory table")
+
     cursor.execute("""
         CREATE TABLE orderhistory (
             OrderID INT PRIMARY KEY NOT NULL,
@@ -140,7 +141,9 @@ def setup_table(cursor):
             Country VARCHAR(150) NOT NULL
         );
     """)
+
     cursor.execute("DROP TABLE IF EXISTS rejecteddata;")
+
     print("Creating rejecteddata table")
     cursor.execute("""
         CREATE TABLE rejecteddata (
@@ -201,14 +204,17 @@ def insert_row(cursor, row, log_file):
         return "inserted"
 
     except Exception as e:
+        # Rolling back previous query that caused an error to allow next queries to run
         cursor.connection.rollback()
         log_file.write(f"[ERROR] OrderID {row.get('OrderID')} failed: {e}\n")
         return "error"
 
-
+# Insert Functin used to insert into rejecteddata table
 def insert_rejected_rows(cursor, row, log_file):
 
     try:
+        # This test for edges cases where dates NaT(Not a Time) ex: 99/99/9999
+        # Sets NaT to None
         order_date = None if pd.isna(row['OrderDate']) else row["OrderDate"]
 
         cursor.execute(INSERT_QUERY_REJECTED, (
@@ -252,7 +258,7 @@ def cleanup_old_logs(max_logs=8):
 # -----------------------------------------------------------
 def main():
     # Choose file
-    file_path = "Dataset.csv"
+    file_path = "DatasetMessy.csv"
 
     # Load
     df = load_file(file_path)
@@ -326,9 +332,12 @@ def main():
         print(categories)
         userInput = input(f"Which category would you like to sort by? (Enter q to exit)")
         userInput =userInput.title().strip()
+        # Q input exits loop
         if userInput == "Q" or userInput == "Q":
             print("Exit successful.")
             break
+        
+        # Invalid input reruns loop
         elif userInput not in categories:
             print("Not a valid parameter. Please try again!")
             continue

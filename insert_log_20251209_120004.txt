@@ -1,0 +1,25 @@
+[MISSING] Row 0 skipped due to missing values.
+[MISSING] Row 3 skipped due to missing values.
+[MISSING] Row 8 skipped due to missing values.
+[MISSING] Row 11 skipped due to missing values.
+[MISSING] Row 15 skipped due to missing values.
+[MISSING] Row 16 skipped due to missing values.
+[MISSING] Row 18 skipped due to missing values.
+[MISSING] Row 19 skipped due to missing values.
+[MISSING] Row 23 skipped due to missing values.
+[MISSING] Row 29 skipped due to missing values.
+[MISSING] Row 30 skipped due to missing values.
+[MISSING] Row 31 skipped due to missing values.
+[MISSING] Row 32 skipped due to missing values.
+[MISSING] Row 33 skipped due to missing values.
+[MISSING] Row 35 skipped due to missing values.
+[MISSING] Row 38 skipped due to missing values.
+[MISSING] Row 39 skipped due to missing values.
+[MISSING] Row 41 skipped due to missing values.
+[MISSING] Row 46 skipped due to missing values.
+[MISSING] Row 47 skipped due to missing values.
+----- IMPORT SUMMARY ----- 
+Inserted rows: 27
+Skipped conflicts: 0
+Skipped errors: 20
+ETL complete.
