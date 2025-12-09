@@ -47,3 +47,5 @@ OrderID,OrderDate,UnitCost,Price,OrderQty,CostOfSales,Sales,Profit,Channel,Promo
 273,11/19/2013,39.6363190310518,77.68,8,317.090552248414,574.832,257.741447751586,Online,European Holiday Promotion,Contoso 4GB Flash MP3 Player E401 Blue,"Contoso, Ltd",MP4&MP3,Audio,Europe,Berlin,Germany
 837,6/17/2013,51.0444614876778,95.95,10,510.444614876778,959.5,449.055385123222,Online,No Discount,Contoso 4GB Portable MP3 Player M450 Black,"Contoso, Ltd",MP4&MP3,Audio,Europe,Berlin,Germany
 407,11/23/2014,203.716003520618,232,16,3259.45605632989,3433.6,174.143943670114,Online,European Holiday Promotion,Contoso 16GB New Generation MP5 Player M1650 Silver,"Contoso, Ltd",MP4&MP3,Audio,Europe,Berlin,Germany
+58,4/6/2014,77.9850288261519,299.0,24.0,1871.64069182765,7056.4,5184.75930817235,Online,Asian Summer Promotion,SV Car Video TFT7 M7000 Silver,Southridge Video,Car Video,TV and Video,Asia,Beijing,China
+58,4/6/2014,77.9850288261519,299.0,24.0,1871.64069182765,7056.4,5184.75930817235,Online,Asian Summer Promotion,SV Car Video TFT7 M7000 Silver,Southridge Video,Car Video,TV and Video,Asia,Beijing,China

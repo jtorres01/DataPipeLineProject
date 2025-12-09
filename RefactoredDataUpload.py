@@ -35,6 +35,15 @@ INSERT INTO orderhistory (
 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 ON CONFLICT (orderid) DO NOTHING;
 """
+INSERT_QUERY_REJECTED = """ 
+INSERT INTO rejecteddata (
+    orderid, orderdate, unitcost, price, orderqty,
+    costofsales, sales, profit, channel, promotionname,
+    productname, manufacturer, productsubcategory, productcategory,
+    region, city, country
+)
+VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+"""
 
 
 # -----------------------------------------------------------
@@ -67,18 +76,29 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
                                       ).dt.date
 
     # Remove duplicates
-    df = df.drop_duplicates(subset=["OrderID"])
+    # I could just have the below line run and get rid of all duplicates before attemping to insert into database,
+    # but I rather have my insert_row method catch it and log all duplicates
+
+    # df = df.drop_duplicates(subset=["OrderID"])
 
     return df
 
 
-def is_valid_row(row: pd.Series) -> bool:
-    """Checks if row has all required fields."""
+def is_valid_row(cursor, row: pd.Series, log_file) -> bool:
+    # Checks if row has all required fields.
 
     for col in REQUIRED_COLUMNS:
-        if col not in row or pd.isna(row[col]) or str(row[col]).strip() == "":
+        if col not in row:
             return False
 
+        value = row[col]
+
+        if pd.isna(row[col]):
+            return False
+        
+        if isinstance(value,str) and value.strip() in ("", "nan", "none", "NaT"):
+            return False
+        
     return True
 
 
@@ -98,8 +118,9 @@ def get_db_connection():
 
 def setup_table(cursor):
     cursor.execute("DROP TABLE IF EXISTS orderhistory;")
+    print("Created orderhistory table")
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS OrderHistory (
+        CREATE TABLE orderhistory (
             OrderID INT PRIMARY KEY NOT NULL,
             OrderDate DATE NOT NULL,
             UnitCost DECIMAL(18,8) NOT NULL,
@@ -119,6 +140,30 @@ def setup_table(cursor):
             Country VARCHAR(150) NOT NULL
         );
     """)
+    cursor.execute("DROP TABLE IF EXISTS rejecteddata;")
+    print("Creating rejecteddata table")
+    cursor.execute("""
+        CREATE TABLE rejecteddata (
+            OrderID INT,
+            OrderDate DATE,
+            UnitCost DECIMAL(18,8),
+            Price DECIMAL(12,2),
+            OrderQty INT,
+            CostOfSales DECIMAL(18,8),
+            Sales DECIMAL(14,2),
+            Profit DECIMAL(18,8) ,
+            Channel VARCHAR(150),
+            PromotionName VARCHAR(150),
+            ProductName VARCHAR(150),
+            Manufacturer VARCHAR(150),
+            ProductSubCategory VARCHAR(150),
+            ProductCategory VARCHAR(150),
+            Region VARCHAR(150),
+            City VARCHAR(150),
+            Country VARCHAR(150)
+        );
+    """)
+
 
 
 # -----------------------------------------------------------
@@ -150,15 +195,43 @@ def insert_row(cursor, row, log_file):
 
         # Detect duplicate
         if cursor.rowcount == 0:
-            log_file.write(f"[DUPLICATE] OrderID {row['OrderID']} skipped.\n")
+            log_file.write(f"[DUPLICATE] OrderID {row['OrderID']} skipped at index {row.name}.\n")
             return "duplicate"
 
         return "inserted"
 
     except Exception as e:
+        cursor.connection.rollback()
         log_file.write(f"[ERROR] OrderID {row.get('OrderID')} failed: {e}\n")
         return "error"
 
+
+def insert_rejected_rows(cursor, row, log_file):
+
+    try:
+        order_date = None if pd.isna(row['OrderDate']) else row["OrderDate"]
+
+        cursor.execute(INSERT_QUERY_REJECTED, (
+                int(row['OrderID']) if pd.notna(row['OrderID']) else None,
+                order_date,
+                float(row['UnitCost']) if pd.notna(row['UnitCost']) else None,
+                float(row['Price']) if pd.notna(row['Price']) else None,
+                int(row['OrderQty']) if pd.notna(row['OrderQty']) else None,
+                float(row['CostOfSales']) if pd.notna(row['CostOfSales']) else None,
+                float(row['Sales']) if pd.notna(row['Sales']) else None,
+                float(row['Profit']) if pd.notna(row['Profit']) else None,
+                row.get('Channel'),
+                row.get('PromotionName'),
+                row.get('ProductName'),
+                row.get('Manufacturer'),
+                row.get('ProductSubCategory'),
+                row.get('ProductCategory'),
+                row.get('Region'),
+                row.get('City'),
+                row.get('Country')
+        ))
+    except Exception as e:
+        log_file.write(f"[REJECTED ERROR] Failed to insert rejected row: {e}\n")
 
 # -----------------------------------------------------------
 # 5. Log Cleanup
@@ -206,18 +279,21 @@ def main():
     # Insert row by row
     for index, row in df.iterrows():
 
-        if not is_valid_row(row):
+        if not is_valid_row(cursor,row, log_file):
             log_file.write(f"[MISSING] Row {index} skipped due to missing values.\n")
+            insert_rejected_rows(cursor, row, log_file)
             skipped_errors += 1
             continue
 
         result = insert_row(cursor, row, log_file)
 
         if result == "duplicate":
+            insert_rejected_rows(cursor, row, log_file)
             skipped_conflicts += 1
         elif result == "inserted":
             inserted_rows += 1
         elif result == "error":
+            insert_rejected_rows(cursor, row, log_file)
             skipped_errors += 1
 
     
@@ -260,8 +336,7 @@ def main():
         print("Outputing graph")
         plot_profit_By_UserInput(df,userInput)
         break # Exit the loop
-
-    #plot_profit_By_UserInput(df,userInput)      
+      
 
 def plot_profit_By_UserInput(df,col):
     

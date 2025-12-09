@@ -27,24 +27,28 @@ def test_clean_data():
 
     cleaned = etl.clean_data(df)
     assert "OrderDate" in cleaned.columns
-    assert len(cleaned) == 1
+    assert len(cleaned) == 2
     assert cleaned["OrderDate"].iloc[0].year == 2024
 
 
 # Ensuring data is ready for insertion
 # Checking that all required colunms are present and are not empty
 def test_is_valid_row_valid():
+    cursor = MagicMock()
+    log_file = None
     row = pd.Series({
         col: "x" for col in etl.REQUIRED_COLUMNS
     })
-    assert etl.is_valid_row(row) is True
+    assert etl.is_valid_row(cursor,row,log_file) is True
 
 # Checking to make sure invalid rows are detected
 def test_is_valid_row_missing():
+    cursor = MagicMock()
+    log_file = None
     row = pd.Series({
         col: "" for col in etl.REQUIRED_COLUMNS
     })
-    assert etl.is_valid_row(row) is False
+    assert etl.is_valid_row(cursor,row,log_file) is False
 
 # Testing a database connection is successfully loaded
 @patch("RefactoredDataUpload.psycopg2.connect")
